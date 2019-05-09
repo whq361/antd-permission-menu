@@ -1,0 +1,59 @@
+txt格式问题，可以用webstrom打开
+注意：下载之后进入项目中运行npm install命令
+
+
+有修改的文件列表如下：
+1：mock/Menu.js  作为模仿后台返回的需要显示的菜单数据
+2：src/services/dynamicMenu.js 请求后台数据
+3：src/models/dynamicmenu.js  model文件
+4：src/layouts/BasicLayout.js 重点修改部分
+
+src/layouts/BasicLayout.js修改部分如下：
+1：
+    dispatch({
+      type: 'dynamicmenu/getDynamicmenu',
+    });
+
+2：
+// 这里新增了dynamicmenu、loading
+export default connect(({ dynamicmenu, loading, global, setting }) => ({
+  dynamicmenu,
+  loading: loading.effects['dynamicmenu/getDynamicmenu'],
+  collapsed: global.collapsed,
+  layout: setting.layout,
+  ...setting,
+}))(BasicLayout);
+
+
+3：
+          <Header
+            menuData={menuTree}
+            handleMenuCollapse={this.handleMenuCollapse}
+            logo={logo}
+            isMobile={isMobile}
+            {...this.props}
+          />
+
+4：
+          <SiderMenu
+            logo={logo}
+            Authorized={Authorized}
+            theme={navTheme}
+            onCollapse={this.handleMenuCollapse}
+            menuData={menuTree}
+            isMobile={isMobile}
+            {...this.props}
+          />
+
+
+5：
+    const {
+      dynamicmenu,
+      navTheme,
+      layout: PropsLayout,
+      children,
+      location: { pathname },
+    } = this.props;
+    const { menuData } = dynamicmenu;
+    // 新增这里， 作为我们返回动态菜单之后的类型转换
+    const menuTree = memoizeOneFormatter(menuData);
